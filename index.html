@@ -2,156 +2,259 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Supervisório de Medidores - Alameda Xingu</title>
   <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #151d30;
+      --panel-bg: #101726;
+      --border: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --ok: #10b981;
+      --ok-glow: rgba(16, 185, 129, 0.25);
+      --fail: #ef4444;
+      --fail-glow: rgba(239, 68, 68, 0.25);
+      --fail-bg: rgba(239, 68, 68, 0.08);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background-color: #0f172a;
-      color: #f8fafc;
+      background-color: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    header h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #e2e8f0;
-      margin-bottom: 6px;
-    }
-
-    .selector-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .btn-floor {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #94a3b8;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.2s ease;
-    }
-
-    .btn-floor:hover {
-      background: #334155;
-      color: #fff;
-    }
-
-    .btn-floor.active {
-      background: #3b82f6;
-      border-color: #60a5fa;
-      color: #ffffff;
-    }
-
-    .street-indicator {
-      width: 100%;
-      max-width: 900px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #93c5fd;
-      border-bottom: 2px dashed #3b82f6;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
-    }
-
-    /* Estrutura da Planta Retangular */
-    .building-container {
-      width: 100%;
-      max-width: 900px;
-      height: 480px;
-      background-color: #3b6cb8;
-      border-radius: 4px;
-      position: relative;
-      display: grid;
-      grid-template-columns: 240px 1fr 240px;
-      grid-template-rows: 210px 1fr 210px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-
-    .center-label {
-      grid-column: 2 / 3;
-      grid-row: 2 / 3;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 0.85rem;
-      pointer-events: none;
-    }
-
-    .center-label strong {
-      font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 4px;
-    }
-
-    /* Casas de Máquinas nas Quinas */
-    .corner-room {
-      background-color: #000000;
       padding: 12px;
       display: flex;
       flex-direction: column;
-      border: 1px solid #1e293b;
-      overflow-y: auto;
+      align-items: center;
     }
 
-    /* Posições de acordo com a referência */
-    .room-d { grid-column: 1; grid-row: 1; }
-    .room-c { grid-column: 3; grid-row: 1; }
-    .room-b { grid-column: 1; grid-row: 3; }
-    .room-a { grid-column: 3; grid-row: 3; }
+    .app-shell {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Top Header */
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 4px 0;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    /* KPI Summary Pills */
+    .kpi-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .kpi-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .kpi-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .kpi-value.ok { color: var(--ok); }
+    .kpi-value.fail { color: var(--fail); }
+
+    .kpi-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    /* Quick Filter Chips (Mobile Scrollable) */
+    .selector-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .selector-bar::-webkit-scrollbar { display: none; }
+
+    .btn-floor {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 7px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-floor:active, .btn-floor.active {
+      background: var(--accent);
+      border-color: #60a5fa;
+      color: #fff;
+    }
+
+    /* Street Indicator */
+    .street-tag {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #60a5fa;
+      padding: 4px;
+      border-bottom: 1px dashed rgba(96, 165, 250, 0.4);
+    }
+
+    /* Floor Plan Grid */
+    .building-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 10px;
+      width: 100%;
+      background: rgba(21, 29, 48, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .building-grid {
+        grid-template-columns: 260px 1fr 260px;
+        grid-template-rows: 240px 1fr 240px;
+        height: 520px;
+      }
+
+      .room-d { grid-column: 1; grid-row: 1; }
+      .room-c { grid-column: 3; grid-row: 1; }
+      .room-b { grid-column: 1; grid-row: 3; }
+      .room-a { grid-column: 3; grid-row: 3; }
+
+      .central-void {
+        grid-column: 2 / 3;
+        grid-row: 1 / 4;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        border: 1px dashed rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        margin: 8px;
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .building-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .central-void {
+        order: -1;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 8px;
+        text-align: center;
+      }
+    }
+
+    .central-void strong {
+      font-size: 0.95rem;
+      color: #e2e8f0;
+    }
+
+    .central-void span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Machine Rooms (Quinas) */
+    .corner-room {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      max-height: 250px;
+      overflow-y: auto;
+    }
 
     .room-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #333;
       padding-bottom: 6px;
       margin-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .room-title {
+    .room-name {
       font-weight: 800;
-      font-size: 1.1rem;
-      color: #ffffff;
+      font-size: 0.95rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .room-name small {
+      font-weight: 500;
+      font-size: 0.7rem;
+      color: var(--text-muted);
     }
 
     .room-badge {
-      font-size: 0.7rem;
-      background: #222;
-      color: #aaa;
+      font-size: 0.65rem;
       padding: 2px 6px;
-      border-radius: 3px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      font-weight: 600;
     }
 
-    /* Lista de Medidores */
+    /* Meters List & Items */
     .meters-list {
       display: flex;
       flex-direction: column;
@@ -159,168 +262,194 @@
     }
 
     .meter-card {
-      background: #111;
-      border-radius: 4px;
-      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 7px 9px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      border-left: 4px solid #555;
-      font-size: 0.75rem;
-    }
-
-    .meter-card.ok {
-      border-left-color: #22c55e;
+      align-items: center;
+      transition: background 0.15s ease;
     }
 
     .meter-card.fail {
-      border-left-color: #ef4444;
-      background: #1c1315;
+      background: var(--fail-bg);
+      border-color: rgba(239, 68, 68, 0.25);
     }
 
     .meter-info {
       display: flex;
       flex-direction: column;
+      gap: 2px;
     }
 
-    .meter-name {
+    .meter-id {
       font-weight: 700;
+      font-size: 0.8rem;
       color: #fff;
     }
 
-    .meter-client {
-      color: #94a3b8;
-      font-size: 0.7rem;
+    .meter-meta {
+      font-size: 0.68rem;
+      color: var(--text-muted);
     }
 
     .meter-status {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 0.7rem;
+      gap: 6px;
     }
 
-    .status-dot {
+    .pulse-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
     }
 
-    .status-dot.ok {
-      background-color: #22c55e;
-      box-shadow: 0 0 6px #22c55e;
+    .pulse-dot.ok {
+      background: var(--ok);
+      box-shadow: 0 0 6px var(--ok-glow);
     }
 
-    .status-dot.fail {
-      background-color: #ef4444;
-      box-shadow: 0 0 6px #ef4444;
+    .pulse-dot.fail {
+      background: var(--fail);
+      box-shadow: 0 0 6px var(--fail-glow);
+      animation: blink 1.2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     .empty-state {
-      font-size: 0.75rem;
-      color: #666;
+      font-size: 0.72rem;
+      color: #64748b;
       text-align: center;
-      margin-top: 20px;
+      padding: 16px 0;
     }
 
-    /* Legenda */
-    .legend {
+    /* Sub-bar Filter Toggle */
+    .filter-actions {
       display: flex;
-      gap: 20px;
-      margin-top: 18px;
-      font-size: 0.8rem;
-      color: #94a3b8;
-    }
-
-    .legend-item {
-      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 6px;
+      padding: 0 2px;
+    }
+
+    .btn-toggle-fail {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-toggle-fail.active {
+      background: var(--fail-bg);
+      border-color: var(--fail);
+      color: var(--fail);
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Supervisório de Medição de Energia</h1>
-  </header>
+  <div class="app-shell">
 
-  <!-- Filtro por Andar -->
-  <div class="selector-bar" id="floorSelector">
-    <button class="btn-floor active" onclick="filterFloor('ALL', this)">Todos os Andares</button>
-    <button class="btn-floor" onclick="filterFloor('1', this)">1º PAV (LIVELO)</button>
-    <button class="btn-floor" onclick="filterFloor('2', this)">2º PAV (ELOPAR)</button>
-    <button class="btn-floor" onclick="filterFloor('3', this)">3º PAV (ALELO)</button>
-    <button class="btn-floor" onclick="filterFloor('4', this)">4º PAV (ALELO)</button>
-    <button class="btn-floor" onclick="filterFloor('8', this)">8º PAV (ELOPAR)</button>
-    <button class="btn-floor" onclick="filterFloor('11', this)">11º PAV (LIVELO)</button>
-    <button class="btn-floor" onclick="filterFloor('16', this)">16º PAV (VELOE)</button>
-  </div>
-
-  <!-- Referência Topo -->
-  <div class="street-indicator">▲ Alameda Xingu ▲</div>
-
-  <!-- Prédio e Casas de Máquinas -->
-  <div class="building-container">
-    
-    <!-- Quina Noroeste: D -->
-    <div class="corner-room room-d">
-      <div class="room-header">
-        <span class="room-title">D</span>
-        <span class="room-badge">Quina Sup. Esq.</span>
+    <header>
+      <div class="title-row">
+        <h1>Supervisório de Medição</h1>
       </div>
-      <div class="meters-list" id="list-D"></div>
-    </div>
+      <div class="street-tag">▲ Alameda Xingu ▲</div>
+    </header>
 
-    <!-- Centro do Edifício -->
-    <div class="center-label">
-      <strong id="floorDisplay">Vista Global</strong>
-      <span>Vão Central</span>
-    </div>
-
-    <!-- Quina Nordeste: C -->
-    <div class="corner-room room-c">
-      <div class="room-header">
-        <span class="room-title">C</span>
-        <span class="room-badge">Quina Sup. Dir.</span>
+    <!-- Resumo dos Indicadores -->
+    <div class="kpi-bar">
+      <div class="kpi-card">
+        <span class="kpi-value" id="kpi-total">0</span>
+        <span class="kpi-label">Total</span>
       </div>
-      <div class="meters-list" id="list-C"></div>
-    </div>
-
-    <!-- Quina Sudoeste: B -->
-    <div class="corner-room room-b">
-      <div class="room-header">
-        <span class="room-title">B</span>
-        <span class="room-badge">Quina Inf. Esq.</span>
+      <div class="kpi-card">
+        <span class="kpi-value ok" id="kpi-ok">0</span>
+        <span class="kpi-label">Online</span>
       </div>
-      <div class="meters-list" id="list-B"></div>
-    </div>
-
-    <!-- Quina Sudeste: A -->
-    <div class="corner-room room-a">
-      <div class="room-header">
-        <span class="room-title">A</span>
-        <span class="room-badge">Quina Inf. Dir.</span>
+      <div class="kpi-card">
+        <span class="kpi-value fail" id="kpi-fail">0</span>
+        <span class="kpi-label">Falhas</span>
       </div>
-      <div class="meters-list" id="list-A"></div>
     </div>
 
-  </div>
+    <!-- Barra de Filtros por Pavimento -->
+    <div class="selector-bar" id="floorSelector">
+      <button class="btn-floor active" onclick="setFloor('ALL', this)">Todos</button>
+      <button class="btn-floor" onclick="setFloor('1', this)">1º LIVELO</button>
+      <button class="btn-floor" onclick="setFloor('2', this)">2º ELOPAR</button>
+      <button class="btn-floor" onclick="setFloor('3', this)">3º ALELO</button>
+      <button class="btn-floor" onclick="setFloor('4', this)">4º ALELO</button>
+      <button class="btn-floor" onclick="setFloor('8', this)">8º ELOPAR</button>
+      <button class="btn-floor" onclick="setFloor('11', this)">11º LIVELO</button>
+      <button class="btn-floor" onclick="setFloor('16', this)">16º VELOE</button>
+    </div>
 
-  <!-- Legenda -->
-  <div class="legend">
-    <div class="legend-item">
-      <span class="status-dot ok"></span>
-      <span>Comunicação Normal</span>
+    <div class="filter-actions">
+      <button class="btn-toggle-fail" id="toggleFailBtn" onclick="toggleOnlyFailures()">
+        Apenas falhas
+      </button>
     </div>
-    <div class="legend-item">
-      <span class="status-dot fail"></span>
-      <span>Falha de Comunicação</span>
+
+    <!-- Planta das Casas de Máquinas -->
+    <div class="building-grid">
+      
+      <!-- Central -->
+      <div class="central-void">
+        <strong id="floorDisplay">Vista Global</strong>
+        <span>Vão Central</span>
+      </div>
+
+      <!-- Quina Noroeste: D -->
+      <div class="corner-room room-d">
+        <div class="room-header">
+          <span class="room-name">D <small>Sup. Esq.</small></span>
+          <span class="room-badge" id="count-D">0</span>
+        </div>
+        <div class="meters-list" id="list-D"></div>
+      </div>
+
+      <!-- Quina Nordeste: C -->
+      <div class="corner-room room-c">
+        <div class="room-header">
+          <span class="room-name">C <small>Sup. Dir.</small></span>
+          <span class="room-badge" id="count-C">0</span>
+        </div>
+        <div class="meters-list" id="list-C"></div>
+      </div>
+
+      <!-- Quina Sudoeste: B -->
+      <div class="corner-room room-b">
+        <div class="room-header">
+          <span class="room-name">B <small>Inf. Esq.</small></span>
+          <span class="room-badge" id="count-B">0</span>
+        </div>
+        <div class="meters-list" id="list-B"></div>
+      </div>
+
+      <!-- Quina Sudeste: A -->
+      <div class="corner-room room-a">
+        <div class="room-header">
+          <span class="room-name">A <small>Inf. Dir.</small></span>
+          <span class="room-badge" id="count-A">0</span>
+        </div>
+        <div class="meters-list" id="list-A"></div>
+      </div>
+
     </div>
+
   </div>
 
   <script>
-    // Lista completa dos medidores conforme o sistema
     const meters = [
       // 1º PAV (LIVELO)
       { id: 'QFAC-011', floor: '1', client: 'LIVELO', room: 'A', ip: '10.2.10.118', status: 'fail' },
@@ -360,22 +489,42 @@
     ];
 
     let currentFloor = 'ALL';
+    let onlyFailures = false;
+
+    function updateKPIs(dataset) {
+      const total = dataset.length;
+      const ok = dataset.filter(m => m.status === 'ok').length;
+      const fail = dataset.filter(m => m.status === 'fail').length;
+
+      document.getElementById('kpi-total').innerText = total;
+      document.getElementById('kpi-ok').innerText = ok;
+      document.getElementById('kpi-fail').innerText = fail;
+    }
 
     function renderMeters() {
       const rooms = ['A', 'B', 'C', 'D'];
       
+      const scopedFloorMeters = meters.filter(m => 
+        currentFloor === 'ALL' || m.floor === currentFloor
+      );
+
+      updateKPIs(scopedFloorMeters);
+
       rooms.forEach(room => {
         const container = document.getElementById(`list-${room}`);
+        const countBadge = document.getElementById(`count-${room}`);
         container.innerHTML = '';
 
-        const filtered = meters.filter(m => {
+        const filtered = scopedFloorMeters.filter(m => {
           const matchRoom = m.room === room;
-          const matchFloor = (currentFloor === 'ALL') || (m.floor === currentFloor);
-          return matchRoom && matchFloor;
+          const matchFail = onlyFailures ? m.status === 'fail' : true;
+          return matchRoom && matchFail;
         });
 
+        countBadge.innerText = filtered.length;
+
         if (filtered.length === 0) {
-          container.innerHTML = '<div class="empty-state">Sem medidores</div>';
+          container.innerHTML = '<div class="empty-state">Nenhum medidor</div>';
           return;
         }
 
@@ -384,11 +533,11 @@
           card.className = `meter-card ${m.status}`;
           card.innerHTML = `
             <div class="meter-info">
-              <span class="meter-name">${m.id}</span>
-              <span class="meter-client">${m.client} - ${m.floor}º PAV</span>
+              <span class="meter-id">${m.id}</span>
+              <span class="meter-meta">${m.client} • ${m.floor}º PAV • ${m.ip}</span>
             </div>
             <div class="meter-status">
-              <span class="status-dot ${m.status}"></span>
+              <span class="pulse-dot ${m.status}"></span>
             </div>
           `;
           container.appendChild(card);
@@ -396,9 +545,8 @@
       });
     }
 
-    function filterFloor(floor, btn) {
+    function setFloor(floor, btn) {
       currentFloor = floor;
-      
       document.querySelectorAll('.btn-floor').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
@@ -408,7 +556,14 @@
       renderMeters();
     }
 
-    // Inicialização
+    function toggleOnlyFailures() {
+      onlyFailures = !onlyFailures;
+      const btn = document.getElementById('toggleFailBtn');
+      btn.classList.toggle('active', onlyFailures);
+      btn.innerText = onlyFailures ? 'Mostrar todos' : 'Apenas falhas';
+      renderMeters();
+    }
+
     renderMeters();
   </script>
 </body>
