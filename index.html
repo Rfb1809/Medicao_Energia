@@ -6,18 +6,17 @@
   <title>Supervisório de Medidores - Alameda Xingu</title>
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: #151d30;
-      --panel-bg: #101726;
-      --border: #1e293b;
-      --text: #f1f5f9;
+      --bg: #090d16;
+      --card-bg: #111827;
+      --room-bg: #0b1120;
+      --border: #1f293d;
+      --text: #f8fafc;
       --text-muted: #94a3b8;
-      --accent: #3b82f6;
+      --accent: #2563eb;
       --ok: #10b981;
-      --ok-glow: rgba(16, 185, 129, 0.25);
+      --ok-soft: rgba(16, 185, 129, 0.15);
       --fail: #ef4444;
-      --fail-glow: rgba(239, 68, 68, 0.25);
-      --fail-bg: rgba(239, 68, 68, 0.08);
+      --fail-soft: rgba(239, 68, 68, 0.2);
     }
 
     * {
@@ -32,379 +31,380 @@
       background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 12px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    .app-shell {
+    .container {
       width: 100%;
-      max-width: 960px;
+      max-width: 860px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
-    /* Top Header */
+    /* Top Bar */
     header {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      padding: 4px 0;
-    }
-
-    .title-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 2px 4px;
     }
 
     h1 {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
     }
 
-    /* KPI Summary Pills */
-    .kpi-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .kpi-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
+    /* Quick Stats */
+    .status-summary {
       display: flex;
-      flex-direction: column;
+      gap: 6px;
+    }
+
+    .pill {
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      display: flex;
       align-items: center;
-      text-align: center;
+      gap: 5px;
     }
+    .pill.total { background: #1e293b; color: #cbd5e1; }
+    .pill.ok { background: var(--ok-soft); color: var(--ok); }
+    .pill.fail { background: var(--fail-soft); color: var(--fail); }
 
-    .kpi-value {
-      font-size: 1.1rem;
-      font-weight: 800;
-    }
-
-    .kpi-value.ok { color: var(--ok); }
-    .kpi-value.fail { color: var(--fail); }
-
-    .kpi-label {
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-    }
-
-    /* Quick Filter Chips (Mobile Scrollable) */
+    /* Barra de Rolagem de Andares */
     .selector-bar {
       display: flex;
       gap: 6px;
       overflow-x: auto;
-      padding-bottom: 4px;
+      padding-bottom: 2px;
       scrollbar-width: none;
     }
     .selector-bar::-webkit-scrollbar { display: none; }
 
     .btn-floor {
-      background: var(--panel-bg);
+      background: #111827;
       border: 1px solid var(--border);
       color: var(--text-muted);
-      padding: 7px 12px;
-      border-radius: 20px;
+      padding: 6px 12px;
+      border-radius: 16px;
       font-weight: 600;
       cursor: pointer;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       white-space: nowrap;
-      transition: all 0.15s ease;
       flex-shrink: 0;
+      transition: all 0.15s ease;
     }
 
-    .btn-floor:active, .btn-floor.active {
+    .btn-floor.active {
       background: var(--accent);
-      border-color: #60a5fa;
+      border-color: #3b82f6;
       color: #fff;
     }
 
-    /* Street Indicator */
-    .street-tag {
+    /* Referência de Rua */
+    .street-indicator {
+      width: 100%;
       text-align: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.15em;
+      font-weight: 800;
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: #60a5fa;
-      padding: 4px;
-      border-bottom: 1px dashed rgba(96, 165, 250, 0.4);
+      padding: 3px;
+      border-bottom: 1.5px dashed rgba(59, 130, 246, 0.5);
     }
 
-    /* Floor Plan Grid */
-    .building-grid {
+    /* Planta Arquitetónica Grid */
+    .floor-plan {
+      width: 100%;
+      background: #0f172a;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-      gap: 10px;
-      width: 100%;
-      background: rgba(21, 29, 48, 0.5);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px;
+      grid-template-rows: minmax(170px, 1fr) minmax(170px, 1fr);
+      gap: 8px;
       position: relative;
     }
 
-    @media (min-width: 768px) {
-      .building-grid {
-        grid-template-columns: 260px 1fr 260px;
-        grid-template-rows: 240px 1fr 240px;
-        height: 520px;
-      }
-
-      .room-d { grid-column: 1; grid-row: 1; }
-      .room-c { grid-column: 3; grid-row: 1; }
-      .room-b { grid-column: 1; grid-row: 3; }
-      .room-a { grid-column: 3; grid-row: 3; }
-
-      .central-void {
-        grid-column: 2 / 3;
-        grid-row: 1 / 4;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        border: 1px dashed rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        margin: 8px;
-        padding: 16px;
-      }
+    /* Centro da Planta */
+    .plan-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(11, 17, 32, 0.94);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(4px);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      pointer-events: none;
+      z-index: 5;
+      min-width: 130px;
     }
 
-    @media (max-width: 767px) {
-      .building-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .central-void {
-        order: -1;
-        padding: 8px;
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: 8px;
-        text-align: center;
-      }
+    .plan-center strong {
+      display: block;
+      font-size: 0.8rem;
+      color: #f1f5f9;
     }
 
-    .central-void strong {
-      font-size: 0.95rem;
-      color: #e2e8f0;
-    }
-
-    .central-void span {
-      font-size: 0.75rem;
+    .plan-center span {
+      font-size: 0.65rem;
       color: var(--text-muted);
     }
 
-    /* Machine Rooms (Quinas) */
+    /* Casas de Máquinas (Quinas) */
     .corner-room {
-      background: var(--panel-bg);
+      background: var(--room-bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 6px;
+      padding: 8px;
       display: flex;
       flex-direction: column;
-      max-height: 250px;
-      overflow-y: auto;
+      overflow: hidden;
+      min-height: 160px;
     }
 
     .room-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 4px;
     }
 
-    .room-name {
+    .room-title {
       font-weight: 800;
-      font-size: 0.95rem;
-      color: #fff;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
 
-    .room-name small {
-      font-weight: 500;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
-    .room-badge {
+    .room-title small {
       font-size: 0.65rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.06);
       color: var(--text-muted);
-      font-weight: 600;
+      font-weight: 500;
     }
 
-    /* Meters List & Items */
-    .meters-list {
+    .room-count {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+
+    /* Lista interna de medidores */
+    .meters-grid {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 2px;
     }
 
+    .meters-grid::-webkit-scrollbar {
+      width: 3px;
+    }
+    .meters-grid::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+
+    /* Cartão do medidor */
     .meter-card {
-      background: rgba(255, 255, 255, 0.02);
+      background: #141d30;
       border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 6px;
-      padding: 7px 9px;
+      border-radius: 5px;
+      padding: 5px 7px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      transition: background 0.15s ease;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .meter-card:active {
+      transform: scale(0.98);
+      background: #1a243c;
     }
 
     .meter-card.fail {
-      background: var(--fail-bg);
-      border-color: rgba(239, 68, 68, 0.25);
-    }
-
-    .meter-info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .meter-id {
-      font-weight: 700;
-      font-size: 0.8rem;
-      color: #fff;
+      background: var(--fail-soft);
+      border-color: rgba(239, 68, 68, 0.4);
     }
 
     .meter-meta {
-      font-size: 0.68rem;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .meter-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .meter-sub {
+      font-size: 0.62rem;
       color: var(--text-muted);
     }
 
-    .meter-status {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
+    .status-dot {
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
+      flex-shrink: 0;
     }
 
-    .pulse-dot.ok {
+    .status-dot.ok {
       background: var(--ok);
-      box-shadow: 0 0 6px var(--ok-glow);
+      box-shadow: 0 0 5px var(--ok);
     }
 
-    .pulse-dot.fail {
+    .status-dot.fail {
       background: var(--fail);
-      box-shadow: 0 0 6px var(--fail-glow);
-      animation: blink 1.2s infinite;
+      box-shadow: 0 0 6px var(--fail);
+      animation: pulse-fail 1.2s infinite;
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+    @keyframes pulse-fail {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
     }
 
     .empty-state {
-      font-size: 0.72rem;
-      color: #64748b;
+      font-size: 0.68rem;
+      color: #475569;
       text-align: center;
-      padding: 16px 0;
+      margin-top: auto;
+      margin-bottom: auto;
     }
 
-    /* Sub-bar Filter Toggle */
-    .filter-actions {
+    /* Modal / Bottom Sheet para Detalhe Técnico */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: flex-end;
+      z-index: 100;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      background: #111827;
+      border-top: 2px solid var(--accent);
+      border-radius: 16px 16px 0 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sheet-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 2px;
     }
 
-    .btn-toggle-fail {
+    .sheet-title {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .close-btn {
       background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      border-radius: 6px;
-      padding: 4px 8px;
-      font-size: 0.72rem;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.2rem;
       cursor: pointer;
-      font-weight: 600;
+      padding: 4px;
     }
 
-    .btn-toggle-fail.active {
-      background: var(--fail-bg);
-      border-color: var(--fail);
-      color: var(--fail);
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #090d16;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.75rem;
+    }
+
+    .detail-item strong {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+    }
+
+    /* Desktop View Tweaks */
+    @media (min-width: 768px) {
+      .floor-plan {
+        height: 520px;
+        grid-template-columns: 240px 1fr 240px;
+        grid-template-rows: 230px 1fr 230px;
+      }
+      .room-d { grid-column: 1; grid-row: 1; }
+      .room-c { grid-column: 3; grid-row: 1; }
+      .room-b { grid-column: 1; grid-row: 3; }
+      .room-a { grid-column: 3; grid-row: 3; }
     }
   </style>
 </head>
 <body>
 
-  <div class="app-shell">
-
+  <div class="container">
     <header>
-      <div class="title-row">
-        <h1>Supervisório de Medição</h1>
+      <h1>Planta de Supervisão</h1>
+      <div class="status-summary">
+        <span class="pill total" id="kpi-total">0</span>
+        <span class="pill ok" id="kpi-ok">0 OK</span>
+        <span class="pill fail" id="kpi-fail">0 FALHA</span>
       </div>
-      <div class="street-tag">▲ Alameda Xingu ▲</div>
     </header>
 
-    <!-- Resumo dos Indicadores -->
-    <div class="kpi-bar">
-      <div class="kpi-card">
-        <span class="kpi-value" id="kpi-total">0</span>
-        <span class="kpi-label">Total</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-value ok" id="kpi-ok">0</span>
-        <span class="kpi-label">Online</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-value fail" id="kpi-fail">0</span>
-        <span class="kpi-label">Falhas</span>
-      </div>
-    </div>
-
-    <!-- Barra de Filtros por Pavimento -->
-    <div class="selector-bar" id="floorSelector">
+    <!-- Seletor de Andares Rápido -->
+    <div class="selector-bar">
       <button class="btn-floor active" onclick="setFloor('ALL', this)">Todos</button>
-      <button class="btn-floor" onclick="setFloor('1', this)">1º LIVELO</button>
-      <button class="btn-floor" onclick="setFloor('2', this)">2º ELOPAR</button>
-      <button class="btn-floor" onclick="setFloor('3', this)">3º ALELO</button>
-      <button class="btn-floor" onclick="setFloor('4', this)">4º ALELO</button>
-      <button class="btn-floor" onclick="setFloor('8', this)">8º ELOPAR</button>
-      <button class="btn-floor" onclick="setFloor('11', this)">11º LIVELO</button>
-      <button class="btn-floor" onclick="setFloor('16', this)">16º VELOE</button>
+      <button class="btn-floor" onclick="setFloor('1', this)">1º (Livelo)</button>
+      <button class="btn-floor" onclick="setFloor('2', this)">2º (Elopar)</button>
+      <button class="btn-floor" onclick="setFloor('3', this)">3º (Alelo)</button>
+      <button class="btn-floor" onclick="setFloor('4', this)">4º (Alelo)</button>
+      <button class="btn-floor" onclick="setFloor('8', this)">8º (Elopar)</button>
+      <button class="btn-floor" onclick="setFloor('11', this)">11º (Livelo)</button>
+      <button class="btn-floor" onclick="setFloor('16', this)">16º (Veloe)</button>
     </div>
 
-    <div class="filter-actions">
-      <button class="btn-toggle-fail" id="toggleFailBtn" onclick="toggleOnlyFailures()">
-        Apenas falhas
-      </button>
-    </div>
+    <!-- Indicador Norte/Rua -->
+    <div class="street-indicator">▲ Alameda Xingu (Norte) ▲</div>
 
-    <!-- Planta das Casas de Máquinas -->
-    <div class="building-grid">
+    <!-- Layout da Planta Arquitetónica -->
+    <div class="floor-plan">
       
-      <!-- Central -->
-      <div class="central-void">
+      <!-- Centro do Prédio -->
+      <div class="plan-center">
         <strong id="floorDisplay">Vista Global</strong>
         <span>Vão Central</span>
       </div>
@@ -412,135 +412,142 @@
       <!-- Quina Noroeste: D -->
       <div class="corner-room room-d">
         <div class="room-header">
-          <span class="room-name">D <small>Sup. Esq.</small></span>
-          <span class="room-badge" id="count-D">0</span>
+          <span class="room-title">D <small>Sup. Esq.</small></span>
+          <span class="room-count" id="count-D">0</span>
         </div>
-        <div class="meters-list" id="list-D"></div>
+        <div class="meters-grid" id="list-D"></div>
       </div>
 
       <!-- Quina Nordeste: C -->
       <div class="corner-room room-c">
         <div class="room-header">
-          <span class="room-name">C <small>Sup. Dir.</small></span>
-          <span class="room-badge" id="count-C">0</span>
+          <span class="room-title">C <small>Sup. Dir.</small></span>
+          <span class="room-count" id="count-C">0</span>
         </div>
-        <div class="meters-list" id="list-C"></div>
+        <div class="meters-grid" id="list-C"></div>
       </div>
 
       <!-- Quina Sudoeste: B -->
       <div class="corner-room room-b">
         <div class="room-header">
-          <span class="room-name">B <small>Inf. Esq.</small></span>
-          <span class="room-badge" id="count-B">0</span>
+          <span class="room-title">B <small>Inf. Esq.</small></span>
+          <span class="room-count" id="count-B">0</span>
         </div>
-        <div class="meters-list" id="list-B"></div>
+        <div class="meters-grid" id="list-B"></div>
       </div>
 
       <!-- Quina Sudeste: A -->
       <div class="corner-room room-a">
         <div class="room-header">
-          <span class="room-name">A <small>Inf. Dir.</small></span>
-          <span class="room-badge" id="count-A">0</span>
+          <span class="room-title">A <small>Inf. Dir.</small></span>
+          <span class="room-count" id="count-A">0</span>
         </div>
-        <div class="meters-list" id="list-A"></div>
+        <div class="meters-grid" id="list-A"></div>
       </div>
 
     </div>
+  </div>
 
+  <!-- Modal com Dados de Manutenção do Medidor -->
+  <div class="modal-overlay" id="detailModal" onclick="closeModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-header">
+        <span class="sheet-title" id="m-id">--</span>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <strong>Pavimento</strong>
+          <span id="m-floor">--</span>
+        </div>
+        <div class="detail-item">
+          <strong>Cliente</strong>
+          <span id="m-client">--</span>
+        </div>
+        <div class="detail-item">
+          <strong>Casa de Máquinas</strong>
+          <span id="m-room">--</span>
+        </div>
+        <div class="detail-item">
+          <strong>Endereço IP</strong>
+          <span id="m-ip">--</span>
+        </div>
+        <div class="detail-item" style="grid-column: span 2;">
+          <strong>Estado de Ligação</strong>
+          <span id="m-status">--</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
     const meters = [
-      // 1º PAV (LIVELO)
       { id: 'QFAC-011', floor: '1', client: 'LIVELO', room: 'A', ip: '10.2.10.118', status: 'fail' },
       { id: 'QFAC-012', floor: '1', client: 'LIVELO', room: 'B', ip: '10.2.10.119', status: 'ok' },
       { id: 'QFAC-013', floor: '1', client: 'LIVELO', room: 'C', ip: '10.2.10.120', status: 'ok' },
       { id: 'QFAC-014', floor: '1', client: 'LIVELO', room: 'D', ip: '10.2.10.121', status: 'fail' },
 
-      // 2º PAV (ELOPAR)
       { id: 'QFAC-023', floor: '2', client: 'ELOPAR', room: 'C', ip: '10.2.10.116', status: 'ok' },
       { id: 'QFAC-024', floor: '2', client: 'ELOPAR', room: 'D', ip: '10.2.10.117', status: 'ok' },
 
-      // 3º PAV (ALELO)
       { id: 'QFAC-031', floor: '3', client: 'ALELO', room: 'A', ip: '10.2.10.112', status: 'fail' },
       { id: 'QFAC-032', floor: '3', client: 'ALELO', room: 'B', ip: '10.2.10.113', status: 'ok' },
       { id: 'QFAC-033', floor: '3', client: 'ALELO', room: 'C', ip: '10.2.10.114', status: 'fail' },
       { id: 'QFAC-034', floor: '3', client: 'ALELO', room: 'D', ip: '10.2.10.115', status: 'fail' },
 
-      // 4º PAV (ALELO)
       { id: 'QFAC-043', floor: '4', client: 'ALELO', room: 'A', ip: '10.2.10.108', status: 'fail' },
       { id: 'QFAC-042', floor: '4', client: 'ALELO', room: 'B', ip: '10.2.10.109', status: 'ok' },
       { id: 'QFAC-041', floor: '4', client: 'ALELO', room: 'C', ip: '10.2.10.110', status: 'ok' },
       { id: 'QFAC-044', floor: '4', client: 'ALELO', room: 'D', ip: '10.2.10.111', status: 'ok' },
 
-      // 8º PAV (ELOPAR)
       { id: 'QFAC-081', floor: '8', client: 'ELOPAR', room: 'A', ip: '10.2.10.104', status: 'ok' },
       { id: 'QFAC-082', floor: '8', client: 'ELOPAR', room: 'B', ip: '10.2.10.105', status: 'ok' },
       { id: 'QFAC-083', floor: '8', client: 'ELOPAR', room: 'C', ip: '10.2.10.106', status: 'ok' },
       { id: 'QFAC-084', floor: '8', client: 'ELOPAR', room: 'D', ip: '10.2.10.107', status: 'ok' },
 
-      // 11º PAV (LIVELO)
       { id: 'QE 02-113', floor: '11', client: 'LIVELO', room: 'C', ip: '10.2.10.102', status: 'fail' },
       { id: 'QE 01-114', floor: '11', client: 'LIVELO', room: 'D', ip: '10.2.10.103', status: 'fail' },
 
-      // 16º PAV (VELOE)
       { id: 'QFAC-161', floor: '16', client: 'VELOE', room: 'A', ip: '10.2.10.100', status: 'ok' },
       { id: 'QFAC-162', floor: '16', client: 'VELOE', room: 'B', ip: '10.2.10.101', status: 'fail' }
     ];
 
     let currentFloor = 'ALL';
-    let onlyFailures = false;
 
-    function updateKPIs(dataset) {
-      const total = dataset.length;
-      const ok = dataset.filter(m => m.status === 'ok').length;
-      const fail = dataset.filter(m => m.status === 'fail').length;
+    function render() {
+      const filtered = meters.filter(m => currentFloor === 'ALL' || m.floor === currentFloor);
 
-      document.getElementById('kpi-total').innerText = total;
-      document.getElementById('kpi-ok').innerText = ok;
-      document.getElementById('kpi-fail').innerText = fail;
-    }
+      // Atualiza KPIs
+      document.getElementById('kpi-total').innerText = `${filtered.length} Totais`;
+      document.getElementById('kpi-ok').innerText = `${filtered.filter(m => m.status === 'ok').length} OK`;
+      document.getElementById('kpi-fail').innerText = `${filtered.filter(m => m.status === 'fail').length} Falha`;
 
-    function renderMeters() {
       const rooms = ['A', 'B', 'C', 'D'];
-      
-      const scopedFloorMeters = meters.filter(m => 
-        currentFloor === 'ALL' || m.floor === currentFloor
-      );
-
-      updateKPIs(scopedFloorMeters);
-
       rooms.forEach(room => {
-        const container = document.getElementById(`list-${room}`);
-        const countBadge = document.getElementById(`count-${room}`);
-        container.innerHTML = '';
+        const list = document.getElementById(`list-${room}`);
+        const count = document.getElementById(`count-${room}`);
+        list.innerHTML = '';
 
-        const filtered = scopedFloorMeters.filter(m => {
-          const matchRoom = m.room === room;
-          const matchFail = onlyFailures ? m.status === 'fail' : true;
-          return matchRoom && matchFail;
-        });
+        const roomMeters = filtered.filter(m => m.room === room);
+        count.innerText = roomMeters.length;
 
-        countBadge.innerText = filtered.length;
-
-        if (filtered.length === 0) {
-          container.innerHTML = '<div class="empty-state">Nenhum medidor</div>';
+        if (roomMeters.length === 0) {
+          list.innerHTML = '<div class="empty-state">Sem medidores</div>';
           return;
         }
 
-        filtered.forEach(m => {
+        roomMeters.forEach(m => {
           const card = document.createElement('div');
           card.className = `meter-card ${m.status}`;
+          card.onclick = () => openDetails(m);
           card.innerHTML = `
-            <div class="meter-info">
-              <span class="meter-id">${m.id}</span>
-              <span class="meter-meta">${m.client} • ${m.floor}º PAV • ${m.ip}</span>
+            <div class="meter-meta">
+              <span class="meter-name">${m.id}</span>
+              <span class="meter-sub">${m.client} • ${m.floor}º</span>
             </div>
-            <div class="meter-status">
-              <span class="pulse-dot ${m.status}"></span>
-            </div>
+            <span class="status-dot ${m.status}"></span>
           `;
-          container.appendChild(card);
+          list.appendChild(card);
         });
       });
     }
@@ -550,21 +557,34 @@
       document.querySelectorAll('.btn-floor').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const floorDisplay = document.getElementById('floorDisplay');
-      floorDisplay.innerText = floor === 'ALL' ? 'Vista Global' : `${floor}º Pavimento`;
-
-      renderMeters();
+      document.getElementById('floorDisplay').innerText = floor === 'ALL' ? 'Vista Global' : `${floor}º Pavimento`;
+      render();
     }
 
-    function toggleOnlyFailures() {
-      onlyFailures = !onlyFailures;
-      const btn = document.getElementById('toggleFailBtn');
-      btn.classList.toggle('active', onlyFailures);
-      btn.innerText = onlyFailures ? 'Mostrar todos' : 'Apenas falhas';
-      renderMeters();
+    function openDetails(meter) {
+      document.getElementById('m-id').innerText = meter.id;
+      document.getElementById('m-floor').innerText = `${meter.floor}º Pavimento`;
+      document.getElementById('m-client').innerText = meter.client;
+      document.getElementById('m-room').innerText = `Quina ${meter.room}`;
+      document.getElementById('m-ip').innerText = meter.ip;
+      
+      const statusEl = document.getElementById('m-status');
+      if (meter.status === 'ok') {
+        statusEl.innerHTML = '<span style="color:var(--ok)">● Comunicação Normal</span>';
+      } else {
+        statusEl.innerHTML = '<span style="color:var(--fail)">● Falha de Comunicação</span>';
+      }
+
+      document.getElementById('detailModal').style.display = 'flex';
     }
 
-    renderMeters();
+    function closeModal(event) {
+      if (!event || event.target.id === 'detailModal' || event.target.classList.contains('close-btn')) {
+        document.getElementById('detailModal').style.display = 'none';
+      }
+    }
+
+    render();
   </script>
 </body>
 </html>
